@@ -1,0 +1,44 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+int findMaxSeq(int left, int right, int arr[]);
+int main(void)
+{
+	int len, i = 0;
+	scanf("%d", &len);
+	int a[len];
+	srand((unsigned)time(NULL));
+	for(; i < len; i++){
+		a[i] = rand() % 20;
+		a[i] = (a[i] % 2)? a[i] : -a[i];
+		printf("%d ", a[i]);
+	}
+	printf("\n%d", findMaxSeq(0, len - 1, a));
+	return 0;
+}
+
+int findMaxSeq(int left, int right, int arr[])
+{
+	if(left == right) return arr[left];     //若不可再分
+	
+	int center = (left + right) / 2;
+	int leftMax = findMaxSeq(left, center, arr);    //左边最大值；
+	int rightMax = findMaxSeq(center + 1, right, arr);  //右边最大值；
+	//跨线最大值
+	int sum = arr[center] + arr[center + 1];
+	int i = center - 1;
+	int tempsum = sum;
+	for(;i >= left; i--){
+		tempsum += arr[i];
+		if(tempsum > sum)   sum = tempsum;
+	}
+	tempsum = sum;
+	for(i = center + 2; i <= right; i++){
+		tempsum += arr[i];
+		if(tempsum > sum)   sum = tempsum;
+	}
+	//比大小
+	sum = (sum > leftMax)? sum : leftMax;
+	sum = (sum > rightMax)? sum : rightMax;
+	return sum;
+}
