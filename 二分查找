@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 10
+struct node{
+	int val[MAX];
+	int last;
+};
+typedef struct node* list;
+
+void insert(int num, int i, list L);
+list makeEmpty(void);
+
+int main(void)
+{
+	int len;
+	int i = 1;
+	int num;
+	int k;
+	list L = makeEmpty();
+	scanf("%d", &len);
+	for(; i <= len; i++){
+		scanf("%d", &num);
+		insert(num, i, L);
+	}
+	scanf("%d", &k);
+	printf("%d", binarySearch(L, k));
+	return 0;
+}
+
+int binarySearch(list L, int k)
+{
+	int center;
+	int left, right;
+	left = 1;
+	right = L->last;
+	center = (left + right) / 2;
+	while(L->val[center] != k){
+		if(k > L->val[center]){
+			left = center;
+		}else if(k < L->val[center]){
+			right = center;
+		}
+		center = (left + right) / 2;
+	}
+	return center;
+}
+
+void insert(int num, int i, list L)
+{
+	L->val[i] = num;
+	L->last++;
+}
+
+list makeEmpty(void)    //创建空表
+{
+	list PtrL;
+	PtrL = (list)malloc(sizeof(struct node));
+	PtrL->last = 0;
+	return PtrL;
+}
