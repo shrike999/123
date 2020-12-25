@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void)
+{
+	int len;
+	scanf("%d", &len);
+	int arr[len];
+	int i = 0;
+	for(; i < len; i++){
+		scanf("%d", &arr[i]);
+	}
+	printf("%d", MaxSeq(0, len, arr));
+	return 0;
+}
+
+int MaxSeq(int left, int right, int arr[])
+{
+	int i, sum, tempsum, prevsum, j, m, n;
+	i = left;
+	sum = arr[left];
+ 	m=i;
+ 	n=i;
+	for(; i < right; i++){
+		prevsum = sum;  //记录前一个sum
+		sum = arr[i];   //每轮一次初始化
+		tempsum = sum;
+		for(j = i + 1; j < right; j++){
+			tempsum += arr[j];
+			sum = (tempsum > sum)? tempsum : sum;
+		}
+		//记录首末
+		if(sum > prevsum){
+			m = i;
+			n = j - 1;
+		}else   sum = prevsum;
+	}
+	printf("%d %d\n",m,n);
+	return sum;
+}
