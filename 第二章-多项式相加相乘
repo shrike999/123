@@ -1,0 +1,152 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct polyNode{
+	int coef;
+	int expon;
+	struct polyNode* next;
+};
+
+typedef struct polyNode* polyNomial;
+
+int compare(int a, int b);
+void attach(int a, int b, polyNomial* x);
+polyNomial add(polyNomial p1, polyNomial p2);
+polyNomial multiply(polyNomial p1, polyNomial p2);
+void read(polyNomial* head);
+void show(polyNomial head);
+
+int main(void)
+{
+ 	polyNomial p1 = NULL;
+	polyNomial p2 = NULL;
+ 	read(&p1);
+    printf("you've entered polynomial no.1:");
+ 	show(p1);
+	read(&p2);
+	printf("you've entered polynomial no.2:");
+ 	show(p2);
+	polyNomial p = add(p1, p2);
+	polyNomial pm = multiply(p1, p2);
+	printf("sum of them is:\n");
+	show(p);
+	printf("product of them is:\n");
+	show(pm);
+	return 0;
+}
+
+int compare(int a, int b)
+{
+	int result = 0;
+	if(a > b) result = 1;
+	else if(a < b) result = -1;
+	
+	return result;
+}
+
+void attach(int a, int b, polyNomial* x)
+{
+	polyNomial New = (polyNomial)malloc(sizeof(struct polyNode));
+	New->coef = a;
+	New->expon = b;
+	New->next = NULL;
+	(*x)->next = New;
+	*x = New;
+}
+
+polyNomial add(polyNomial p1, polyNomial p2)
+{
+	polyNomial front, rear, temp;
+	rear = (polyNomial)malloc(sizeof(struct polyNode));
+	front = rear;
+	while(p1 && p2)
+	{
+		switch(compare(p1->expon, p2->expon))
+		{
+			case 1:
+				attach(p1->coef, p1->expon, &rear);
+				p1 = p1->next;
+				break;
+			case 0:
+				attach(p1->coef+p2->coef, p1->expon, &rear);
+				p1 = p1->next;
+				p2 = p2->next;
+				break;
+			case -1:
+				attach(p2->coef, p2->expon, &rear);
+				p2 = p2->next;
+				break;
+		}
+	}
+	for(;p1;p1 = p1->next) attach(p1->coef, p1->expon, &rear);
+	for(;p2;p2 = p2->next) attach(p2->coef, p2->expon, &rear);
+	temp = front;
+	front = front->next;
+	free(temp);
+	return front;
+}
+
+void read(polyNomial* head)
+{
+	polyNomial prev = NULL;
+	polyNomial current = *head;
+	printf("输入多项式的元素，按q结束\n");
+	while(1)
+	{
+ 		current = (polyNomial)malloc(sizeof(struct polyNode));
+ 		if(scanf("%d %d", &current->coef, &current->expon) != 2) break;
+ 		if(*head == NULL)	*head = current;
+ 		else	prev->next = current;
+		current->next = NULL;
+		prev = current;
+	}
+	getchar();
+}
+
+void show(polyNomial head)
+{
+	if(head == NULL) printf("no data entered\n");
+	else{
+		polyNomial current;
+		current = head;
+		for(; current; current = current->next){
+			printf("%dx^%d", current->coef, current->expon);
+			if(current->next) printf("+");
+		}
+		printf("\n");
+	}
+}
+
+polyNomial multiply(polyNomial p1, polyNomial p2)
+{
+	polyNomial p, t1, t2, t, temp, frontCell;
+	p = (polyNomial)malloc(sizeof(struct polyNode));
+	
+	t1 = p1;
+	t2 = p2;
+	t = p;
+	for(; t2; t2 = t2->next){
+		attach(t1->coef * t2->coef, t1->expon + t2->expon, &t);
+	}
+	for(t1 = t1->next; t1; t1 = t1->next){
+		for(t2 = p2; t2; t2 = t2->next)
+  		{
+  			t = p;
+			while(t->next && t->next->expon > t1->expon + t2->expon){
+				t = t->next;
+			}
+			if(t->next && t->next->expon == t1->expon + t2->expon){
+				t->next->coef = t1->coef * t2->coef;
+				if(!(t->next->coef))    t->next = t->next->next;
+			}
+			else{
+				temp = t->next;
+				attach(t1->coef * t2->coef, t1->expon + t2->expon, &t);
+				t->next = temp;
+			}
+		}
+	}
+	frontCell = p;
+	p = p->next;
+	free(frontCell);
+	return p;
+}
